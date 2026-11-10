@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Happy Birthday Ekansh!</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at center,#765078,#35243f 65%,#171321);color:white;font-family:Georgia,serif;text-align:center;overflow-x:hidden}
+.room{min-height:100vh;padding:75px 12px 30px;position:relative;overflow:hidden}
+h1{font-size:clamp(32px,7vw,58px);color:#ffe6a2;text-shadow:0 4px 15px #170d22;margin:12px 0}
+.sub{letter-spacing:3px;font:12px Arial;color:#f5d6dc}
+.banner{position:absolute;top:25px;left:0;right:0;color:#ffdf98;font-size:22px;letter-spacing:5px}
+.decor{position:absolute;top:90px;font-size:45px;opacity:.9}
+.d1{left:5%}.d2{left:20%;top:145px}.d3{right:20%;top:130px}.d4{right:5%}
+.curtain{position:absolute;top:0;bottom:0;width:9%;background:repeating-linear-gradient(90deg,#572442,#9c4568 15px,#572442 30px)}
+.left{left:0}.right{right:0}
+.table{width:min(760px,96%);height:350px;margin:20px auto 0;position:relative}
+.cake{position:absolute;bottom:65px;left:50%;transform:translateX(-50%);width:72%;height:190px;border-radius:22px;background:linear-gradient(90deg,#a94c67,#e9a0a1,#f5c6b0,#d8798d,#97445e);box-shadow:inset 0 -20px #a94b65,0 15px 25px #160c20}
+.cake:before{content:"";position:absolute;top:-15px;left:-2%;width:104%;height:35px;border-radius:50%;background:#fff0d8;box-shadow:0 6px #f5c6b0}
+.fruit{position:absolute;top:-27px;left:0;right:0;font-size:25px;z-index:2}
+.drip{position:absolute;top:5px;left:15%;width:18px;height:30px;border-radius:0 0 12px 12px;background:#fff0d8;box-shadow:95px 2px #fff0d8,190px -2px #fff0d8}
+.plate{position:absolute;bottom:43px;left:50%;transform:translateX(-50%);width:90%;height:27px;border-radius:50%;background:linear-gradient(#fff0c9,#cba66d,#8c5d4c)}
+.candle{position:absolute;z-index:3;bottom:289px;left:50%;transform:translateX(-50%);height:76px;width:19px;border-radius:5px;background:repeating-linear-gradient(135deg,#fff4d5 0 9px,#d94d69 9px 17px)}
+.flame{position:absolute;top:-38px;left:50%;transform:translateX(-50%);width:25px;height:38px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,#fff 0 15%,#ffd34f 40%,#ff7030 72%,transparent 75%);filter:drop-shadow(0 0 12px orange);animation:flicker .16s infinite alternate}
+@keyframes flicker{to{transform:translateX(-50%) scale(.85,1.1)}}
+.off{display:none}
+.tabletop{position:absolute;bottom:0;width:100%;height:43px;border-radius:8px;background:linear-gradient(#d99a6b,#754438);box-shadow:0 12px #482b32}
+.instructions{font:15px Arial;line-height:1.5;color:#ffe9df;margin:12px auto;max-width:550px}
+button{border:0;border-radius:30px;padding:14px 19px;margin:5px;background:linear-gradient(135deg,#ffe7a4,#f3b85e);color:#512a3d;font-weight:bold;font-size:14px;cursor:pointer}
+button.secondary{background:#f5d9dd}
+button:disabled{opacity:.6}
+#status{font:13px Arial;color:#ffe5a0;min-height:25px;margin-top:10px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:9}
+.piece{position:absolute;top:-20px;width:9px;height:15px;animation:fall 4s linear forwards}
+@keyframes fall{to{top:110vh;transform:translateY(100px) rotate(800deg)}}
+@media(max-width:480px){
+.table{height:285px}
+.cake{height:158px;width:78%;bottom:62px}
+.candle{bottom:235px;height:66px;width:16px}
+.plate{bottom:42px;width:94%}
+.fruit{font-size:18px}
+.room{padding-top:105px}
+}
+</style>
+</head>
+<body>
+<div class="room">
+<div class="curtain left"></div>
+<div class="curtain right"></div>
+<div class="banner">✨ HAPPY BIRTHDAY ✨</div>
+<div class="decor d1">🎈</div>
+<div class="decor d2">🎈</div>
+<div class="decor d3">🎈</div>
+<div class="decor d4">🎈</div>
+
+<h1>Happy Birthday, Ekansh!</h1>
+<div class="sub">A SPECIAL CELEBRATION JUST FOR YOU</div>
+
+<div class="table">
+<div class="plate"></div>
+<div class="cake">
+<div class="fruit">🍓　🍒　🍓　🍒</div>
+<div class="drip"></div>
+</div>
+<div class="candle"><div class="flame" id="flame"></div></div>
+<div class="tabletop"></div>
+</div>
+
+<p class="instructions" id="instruction">
+Make a wish! Enable your microphone and blow or whistle to put out the candle.
+</p>
+
+<button id="mic">🎤 Enable Microphone</button>
+<button class="secondary" id="blow">💨 Blow Out Candle</button>
+<button class="secondary" id="reset">↻ Relight Candle</button>
+
+<div id="status">Your birthday surprise is ready! 🎉</div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+let finished=false,stream=null,analyser=null,timer=null,ctx=null;
+
+function celebration(){
+ if(finished)return;
+ finished=true;
+ document.getElementById('flame').classList.add('off');
+ document.getElementById('status').textContent='🎉 Your birthday surprise is starting!';
+ document.getElementById('instruction').textContent='Wish made! Happy Birthday Ekansh! ❤️';
+
+ confetti();
+
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ if(timer)clearInterval(timer);
+
+ sayBirthday();
+}
+
+function confetti(){
+ const layer=document.getElementById('confetti');
+ layer.innerHTML='';
+ const colors=['#f6c85f','#e87991','#8dc5b2','#fff0c9','#bd8be0'];
+ for(let i=0;i<100;i++){
+  let p=document.createElement('i');
+  p.className='piece';
+  p.style.left=Math.random()*100+'%';
+  p.style.background=colors[i%colors.length];
+  p.style.animationDuration=(2+Math.random()*3)+'s';
+  layer.appendChild(p);
+ }
+ setTimeout(()=>layer.innerHTML='',5500);
+}
+
+function sayBirthday(){
+ if(!('speechSynthesis' in window)){
+  birthdayTune();return;
+ }
+ speechSynthesis.cancel();
+ const msg=new SpeechSynthesisUtterance('Happy Birthday Ekansh!');
+ const voices=speechSynthesis.getVoices();
+ const indian=voices.find(v=>v.lang==='en-IN')||
+              voices.find(v=>/india|indian/i.test(v.name));
+ if(indian)msg.voice=indian;
+ msg.lang=indian?indian.lang:'en-IN';
+ msg.rate=.88;
+ msg.pitch=1.08;
+ msg.volume=1;
+ msg.onend=()=>{
+  document.getElementById('status').textContent='🎶 Playing your birthday tune!';
+  birthdayTune();
+ };
+ msg.onerror=birthdayTune;
+ speechSynthesis.speak(msg);
+}
+
+function birthdayTune(){
+ ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();
+ if(ctx.state==='suspended')ctx.resume();
+
+ // Original Indian celebration-inspired melody
+ // with a shehnai-like lead, drone and tabla-style beats.
+ const notes=[
+ [523,.22],[587,.22],[659,.42],[587,.22],[523,.22],[440,.48],
+ [523,.22],[587,.22],[659,.42],[784,.42],[659,.22],[587,.55],
+ [659,.22],[784,.22],[880,.42],[784,.22],[659,.22],[587,.42],[523,.62],
+ [587,.22],[659,.22],[784,.42],[659,.22],[587,.22],[523,.72]
+ ];
+
+ let t=ctx.currentTime+.12;
+ const total=notes.reduce((a,n)=>a+n[1]+.035,0);
+
+ [131,196].forEach((f,i)=>{
+  let o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='triangle';o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(i===0?.035:.022,t+.18);
+  g.gain.setValueAtTime(i===0?.035:.022,t+total-.1);
+  g.gain.exponentialRampToValueAtTime(.0001,t+total);
+  o.connect(g);g.connect(ctx.destination);
+  o.start(t);o.stop(t+total+.02);
+ });
+
+ notes.forEach(([f,d],i)=>{
+  let o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='triangle';o.frequency.value=f;
+  o.frequency.linearRampToValueAtTime(f*1.012,t+d*.35);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(.13,t+.025);
+  g.gain.exponentialRampToValueAtTime(.0001,t+d*.9);
+  o.connect(g);g.connect(ctx.destination);
+  o.start(t);o.stop(t+d);
+
+  if(i%3===0){
+   let drum=ctx.createOscillator(),dg=ctx.createGain();
+   drum.type='sine';
+   drum.frequency.setValueAtTime(i%2===0?115:185,t);
+   drum.frequency.exponentialRampToValueAtTime(65,t+.11);
+   dg.gain.setValueAtTime(.0001,t);
+   dg.gain.exponentialRampToValueAtTime(.075,t+.012);
+   dg.gain.exponentialRampToValueAtTime(.0001,t+.13);
+   drum.connect(dg);dg.connect(ctx.destination);
+   drum.start(t);drum.stop(t+.14);
+  }
+  t+=d+.035;
+ });
+}
+
+async function enableMic(){
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({
+   audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}
+  });
+  ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const source=ctx.createMediaStreamSource(stream);
+  analyser=ctx.createAnalyser();
+  analyser.fftSize=1024;
+  source.connect(analyser);
+  const data=new Uint8Array(analyser.fftSize);
+  let loud=0;
+
+  document.getElementById('status').textContent='🎤 Microphone ready! Blow or whistle now.';
+  document.getElementById('mic').textContent='Microphone Enabled';
+  document.getElementById('mic').disabled=true;
+
+  timer=setInterval(()=>{
+   if(finished)return;
+   analyser.getByteTimeDomainData(data);
+   let sum=0;
+   for(let v of data){
+    let n=(v-128)/128;
+    sum+=n*n;
+   }
+   let volume=Math.sqrt(sum/data.length);
+   if(volume>.105)loud++;
+   else loud=Math.max(0,loud-1);
+   if(loud>=5)celebration();
+  },90);
+
+ }catch(e){
+  document.getElementById('status').textContent=
+  'Microphone unavailable. Use the Blow Out Candle button.';
+ }
+}
+
+document.getElementById('mic').onclick=enableMic;
+document.getElementById('blow').onclick=celebration;
+
+document.getElementById('reset').onclick=()=>{
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ if(timer)clearInterval(timer);
+ if('speechSynthesis' in window)speechSynthesis.cancel();
+ finished=false;
+ document.getElementById('flame').classList.remove('off');
+ document.getElementById('mic').disabled=false;
+ document.getElementById('mic').textContent='🎤 Enable Microphone';
+ document.getElementById('status').textContent='Your birthday surprise is ready! 🎉';
+ document.getElementById('instruction').textContent=
+ 'Make a wish! Enable your microphone and blow or whistle to put out the candle.';
+};
+</script>
+</body>
+</html>
